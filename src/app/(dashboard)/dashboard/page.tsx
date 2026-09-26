@@ -110,9 +110,13 @@ export default function DashboardPage() {
               <p className="text-2xl font-bold">
                 {stats.patientsByCondition
                   .filter(
-                    (c) => c.condition === "Stable" || c.condition === "Good",
+                    (c: { condition: string }) =>
+                      c.condition === "Stable" || c.condition === "Good",
                   )
-                  .reduce((sum, c) => sum + c.count, 0)}
+                  .reduce(
+                    (sum: number, c: { count: number }) => sum + c.count,
+                    0,
+                  )}
               </p>
             </div>
             <div className="rounded-lg bg-muted/40 p-4">
