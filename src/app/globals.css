@@ -76,8 +76,8 @@
 
   --radius: 0.625rem;
 
-  --sidebar: 210 40% 15%;
-  --sidebar-foreground: 210 40% 90%;
+  --sidebar: 0 0% 100%;
+  --sidebar-foreground: 222 47% 11%;
 }
 
 .dark {

@@ -47,7 +47,7 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
               "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",
               isActive
                 ? "bg-primary text-primary-foreground shadow-sm"
-                : "text-sidebar-foreground/80 hover:bg-white/10 hover:text-white",
+                : "text-sidebar-foreground/80 hover:bg-sidebar-foreground/10 hover:text-sidebar-foreground",
             )}
           >
             <Icon className="w-4.5 h-4.5 shrink-0" />
@@ -65,7 +65,7 @@ function DesktopBrand() {
       <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-primary text-primary-foreground shrink-0">
         <Activity className="w-5 h-5" />
       </div>
-      <span className="text-base font-bold text-white tracking-tight">
+      <span className="text-base font-bold text-sidebar-foreground tracking-tight">
         Doctor Tracker
       </span>
     </Link>
@@ -78,7 +78,7 @@ function MobileBrand() {
       <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-primary text-primary-foreground shrink-0">
         <Activity className="w-5 h-5" />
       </div>
-      <SheetTitle className="text-base font-bold text-white tracking-tight">
+      <SheetTitle className="text-base font-bold text-sidebar-foreground tracking-tight">
         Doctor Tracker
       </SheetTitle>
     </Link>
@@ -97,13 +97,13 @@ function UserSection({ onLogout }: { onLogout: () => void }) {
 
   return (
     <div className="flex items-center gap-3 px-2 py-2">
-      <Avatar className="w-9 h-9 border-2 border-white/20">
+      <Avatar className="w-9 h-9 border-2 border-sidebar-foreground/20">
         <AvatarFallback className="bg-primary text-primary-foreground text-xs font-semibold">
           {initials}
         </AvatarFallback>
       </Avatar>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-white truncate">
+        <p className="text-sm font-medium text-sidebar-foreground truncate">
           {user?.name || "Admin"}
         </p>
         <p className="text-xs text-sidebar-foreground/60 truncate">
@@ -114,7 +114,7 @@ function UserSection({ onLogout }: { onLogout: () => void }) {
         variant="ghost"
         size="icon"
         onClick={onLogout}
-        className="text-sidebar-foreground/60 hover:text-white hover:bg-white/10 h-8 w-8"
+        className="text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-foreground/10 h-8 w-8"
         aria-label="Log out"
       >
         <LogOut className="w-4 h-4" />
@@ -137,7 +137,7 @@ export function Sidebar() {
     <>
       {/* Desktop Sidebar */}
       <aside className="hidden lg:flex flex-col w-64 shrink-0 h-screen sticky top-0 bg-sidebar text-sidebar-foreground">
-        <div className="flex items-center h-16 px-4 border-b border-white/10">
+        <div className="flex items-center h-16 px-4 border-b border-sidebar-foreground/10">
           <DesktopBrand />
         </div>
         <div className="flex-1 overflow-y-auto p-3">
@@ -146,14 +146,14 @@ export function Sidebar() {
           </p>
           <NavLinks />
         </div>
-        <Separator className="bg-white/10" />
+        <Separator className="bg-sidebar-foreground/10" />
         <div className="p-3">
           <UserSection onLogout={handleLogout} />
         </div>
       </aside>
 
       {/* Mobile Header with Sheet trigger */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-between h-16 px-4 bg-sidebar text-white border-b border-white/10">
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-between h-16 px-4 bg-sidebar text-sidebar-foreground border-b border-sidebar-foreground/10">
         <div className="flex items-center gap-2">
           <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary text-primary-foreground">
             <Activity className="w-5 h-5" />
@@ -167,16 +167,16 @@ export function Sidebar() {
             <Button
               variant="ghost"
               size="icon"
-              className="text-white hover:bg-white/10"
+              className="text-sidebar-foreground hover:bg-sidebar-foreground/10"
             >
               <Menu className="w-5 h-5" />
             </Button>
           </SheetTrigger>
           <SheetContent
             side="left"
-            className="w-72 p-0 bg-sidebar text-sidebar-foreground border-white/10 [&>button]:text-white [&>button]:opacity-100"
+            className="w-72 p-0 bg-sidebar text-sidebar-foreground border-sidebar-foreground/10 [&>button]:text-sidebar-foreground [&>button]:opacity-100"
           >
-            <div className="flex items-center h-16 px-4 border-b border-white/10 justify-between">
+            <div className="flex items-center h-16 px-4 border-b border-sidebar-foreground/10 justify-between">
               <MobileBrand />
             </div>
             <div className="flex-1 overflow-y-auto p-3">
@@ -185,7 +185,7 @@ export function Sidebar() {
               </p>
               <NavLinks onNavigate={() => setMobileOpen(false)} />
             </div>
-            <Separator className="bg-white/10" />
+            <Separator className="bg-sidebar-foreground/10" />
             <div className="p-3">
               <UserSection onLogout={handleLogout} />
             </div>
