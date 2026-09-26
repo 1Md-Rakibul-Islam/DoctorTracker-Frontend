@@ -174,7 +174,7 @@ export function Sidebar() {
           </SheetTrigger>
           <SheetContent
             side="left"
-            className="w-72 p-0 bg-sidebar text-sidebar-foreground border-white/10"
+            className="w-72 p-0 bg-sidebar text-sidebar-foreground border-white/10 [&>button]:text-white [&>button]:opacity-100"
           >
             <div className="flex items-center h-16 px-4 border-b border-white/10 justify-between">
               <MobileBrand />

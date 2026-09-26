@@ -30,9 +30,9 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen bg-background flex">
       <Sidebar />
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 pt-16 lg:pt-0">
         <DashboardHeader />
-        <main className="flex-1 p-4 lg:p-6 pt-20 lg:pt-6">
+        <main className="flex-1 p-4 lg:p-6">
           <div className="animate-fade-in">{children}</div>
         </main>
       </div>

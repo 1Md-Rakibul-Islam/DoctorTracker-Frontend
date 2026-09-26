@@ -42,7 +42,7 @@ export function DashboardHeader() {
   const { title, subtitle } = getPageTitle(pathname);
 
   return (
-    <header className="sticky top-16 lg:top-0 z-30 flex h-16 items-center gap-4 border-b bg-background/95 backdrop-blur px-4 lg:px-6">
+    <header className="sticky top-16 lg:top-0 z-30 flex h-16 items-center gap-4 border-b bg-background/80 backdrop-blur-md px-4 lg:px-6 transition-all duration-200">
       <div className="flex-1 min-w-0">
         <h1 className="text-lg font-semibold tracking-tight truncate">
           {title}
