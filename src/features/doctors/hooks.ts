@@ -11,8 +11,8 @@ import {
   getSpecializations,
   getHospitals,
 } from './api';
-import type { Doctor, DoctorFilters, CreateDoctorInput } from './types';
-import type { Patient } from '@/types/common';
+import type { IDoctor as Doctor, DoctorFilters, ICreateDoctorInput as CreateDoctorInput } from './types';
+import type { IPatient as Patient } from '@/types/patient.interface';
 import { toast } from 'sonner';
 
 export function useDoctors(page: number, pageSize: number, filters: DoctorFilters) {

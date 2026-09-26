@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { Eye, Users, Trash2 } from "lucide-react";
-import type { PatientWithDoctor } from "@/feathers/patients/types";
-import { useDeletePatientGlobal } from "@/feathers/patients/hooks";
+import type { IPatientWithDoctor as PatientWithDoctor } from "@/features/patients/types";
+import { useDeletePatientGlobal } from "@/features/patients/hooks";
 import { formatDate, getInitials } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";

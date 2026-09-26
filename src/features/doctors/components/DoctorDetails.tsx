@@ -12,7 +12,6 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import type { IPatient } from "@/types/patient.interface";
 import type { IDoctor } from "@/types/doctor.interface";
 
@@ -49,7 +48,6 @@ interface DoctorDetailsProps {
 }
 
 export function DoctorDetails({ doctor, patients }: DoctorDetailsProps) {
-  const router = useRouter();
   const deletePatient = useDeletePatient();
 
   return (

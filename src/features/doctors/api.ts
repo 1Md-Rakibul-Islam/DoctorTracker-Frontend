@@ -2,7 +2,7 @@
 
 import doctorsData from '@/data/doctors.json';
 import patientsData from '@/data/patients.json';
-import type { Doctor, Patient, DoctorFilters, DoctorWithPatientCount, CreateDoctorInput } from './types';
+import type { IDoctor as Doctor, IPatient as Patient, DoctorFilters, IDoctorWithPatientCount as DoctorWithPatientCount, ICreateDoctorInput as CreateDoctorInput } from './types';
 
 let doctors: Doctor[] = [...doctorsData] as Doctor[];
 let patients: Patient[] = [...patientsData] as Patient[];

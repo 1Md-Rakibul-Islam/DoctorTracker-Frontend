@@ -90,7 +90,7 @@ function UserSection({ onLogout }: { onLogout: () => void }) {
   const initials = user
     ? user.name
         .split(" ")
-        .map((p) => p[0])
+        .map((p: string) => p[0])
         .join("")
         .slice(0, 2)
     : "AD";

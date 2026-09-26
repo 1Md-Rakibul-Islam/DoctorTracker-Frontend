@@ -3,9 +3,9 @@
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { usePatient } from "@/feathers/patients/hooks";
-import { getDoctorName } from "@/feathers/patients/api";
-import { PatientForm } from "@/feathers/patients/components/PatientForm";
+import { usePatient } from "@/features/patients/hooks";
+import { getDoctorName } from "@/features/patients/api";
+import { PatientForm } from "@/features/patients/components/PatientForm";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";

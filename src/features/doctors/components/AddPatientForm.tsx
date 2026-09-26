@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -46,7 +45,6 @@ interface AddPatientFormProps {
 }
 
 export function AddPatientForm({ doctorId, children }: AddPatientFormProps) {
-  const router = useRouter();
   const addPatient = useAddPatientToDoctor();
 
   const {

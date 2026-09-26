@@ -1,3 +1,3 @@
-import type { DashboardStats } from '@/types/common';
+import type { IDashboardStats as DashboardStats } from '@/types/common.interface';
 
 export type { DashboardStats };

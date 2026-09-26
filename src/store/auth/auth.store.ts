@@ -2,7 +2,7 @@
 
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import type { AuthUser } from '@/types/common';
+import type { IAuthUser as AuthUser } from '@/types/common.interface';
 import usersData from '@/data/users.json';
 
 interface AuthState {

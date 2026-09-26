@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { Users } from "lucide-react";
-import type { PatientFilters } from "@/features/patients/types";
+import type { IPatientFilters } from "@/features/patients/types";
 import { usePatients } from "@/features/patients/hooks";
 import { PatientTable } from "@/features/patients/components/PatientTable";
 import { PatientFiltersBar } from "@/features/patients/components/PatientFilters";
@@ -21,7 +21,7 @@ const PAGE_SIZE = 8;
 
 export default function PatientsPage() {
   const [page, setPage] = useState(1);
-  const [filters, setFilters] = useState<PatientFilters>({
+  const [filters, setFilters] = useState<IPatientFilters>({
     search: "",
     condition: "all",
     gender: "all",
@@ -32,7 +32,7 @@ export default function PatientsPage() {
 
   const { data, isLoading } = usePatients(page, PAGE_SIZE, filters);
 
-  const handleFilterChange = (newFilters: PatientFilters) => {
+  const handleFilterChange = (newFilters: IPatientFilters) => {
     setFilters(newFilters);
     setPage(1);
   };

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Eye, Stethoscope, Mail, Phone } from "lucide-react";
-import type { ICreateDoctorInput } from "@/features/doctors/types";
+import type { IDoctorWithPatientCount } from "@/features/doctors/types";
 import { formatDate, getInitials } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/table";
 
 interface IDoctorTableProps {
-  doctors: ICreateDoctorInput[];
+  doctors: IDoctorWithPatientCount[];
 }
 
 export function DoctorTable({ doctors }: IDoctorTableProps) {
