@@ -54,8 +54,10 @@ export function AddPatientForm({ doctorId, children }: AddPatientFormProps) {
     watch,
     reset,
     formState: { errors },
-  } = useForm<AddPatientFormInput, AddPatientFormData>({
-    resolver: zodResolver(addPatientSchema),
+  } = useForm<AddPatientFormData>({
+    resolver: zodResolver(
+      addPatientSchema,
+    ) as unknown as import("react-hook-form").Resolver<AddPatientFormData>,
     defaultValues: {
       name: "",
       age: 0,
@@ -102,10 +104,7 @@ export function AddPatientForm({ doctorId, children }: AddPatientFormProps) {
             Register a new patient under this doctor
           </DialogDescription>
         </DialogHeader>
-        <form
-          onSubmit={handleSubmit(onSubmit as unknown as () => void)}
-          className="space-y-4"
-        >
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="pat-name">Full Name</Label>
@@ -126,7 +125,7 @@ export function AddPatientForm({ doctorId, children }: AddPatientFormProps) {
                 id="pat-age"
                 type="number"
                 placeholder="35"
-                {...register("age")}
+                {...register("age", { valueAsNumber: true })}
               />
               {errors.age && (
                 <p className="text-xs text-destructive">{errors.age.message}</p>

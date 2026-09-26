@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { Save, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,7 +41,9 @@ export function PatientForm({ patient }: PatientFormProps) {
     watch,
     formState: { errors, isSubmitting },
   } = useForm<PatientFormData>({
-    resolver: zodResolver(patientSchema),
+    resolver: zodResolver(
+      patientSchema,
+    ) as unknown as import("react-hook-form").Resolver<PatientFormData>,
     defaultValues: {
       name: patient.name,
       age: patient.age,
@@ -102,7 +105,7 @@ export function PatientForm({ patient }: PatientFormProps) {
                 id="pat-age"
                 type="number"
                 placeholder="35"
-                {...register("age")}
+                {...register("age", { valueAsNumber: true })}
               />
               {errors.age && (
                 <p className="text-xs text-destructive">{errors.age.message}</p>
