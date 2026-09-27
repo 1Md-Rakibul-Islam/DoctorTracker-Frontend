@@ -21,10 +21,21 @@ interface PatientFiltersProps {
 
 const conditions = ["Critical", "Serious", "Fair", "Stable", "Good"];
 
+import { useDoctors } from "@/features/doctors/hooks";
+
 export function PatientFiltersBar({
   filters,
   onFilterChange,
 }: PatientFiltersProps) {
+  const { data: doctorsDataRes } = useDoctors(1, 100, {
+    search: "",
+    specialization: "all",
+    hospital: "all",
+    dateFrom: "",
+    dateTo: "",
+  });
+  const doctorsData = doctorsDataRes?.data || [];
+
   const update = (key: keyof IPatientFilters, value: string) => {
     onFilterChange({ ...filters, [key]: value });
   };
