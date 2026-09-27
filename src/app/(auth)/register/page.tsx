@@ -37,13 +37,12 @@ export default function RegisterPage() {
       name: "",
       email: "",
       password: "",
-      role: "admin",
     },
   });
 
   const onSubmit = async (data: RegisterFormData) => {
     setIsLoading(true);
-    const result = await registerUser(data);
+    const result = await registerUser({ ...data, role: "admin" });
     if (result.success) {
       toast.success("Account created!", {
         description: "You have successfully registered. Please log in.",
@@ -158,8 +157,6 @@ export default function RegisterPage() {
                   </p>
                 )}
               </div>
-
-              
 
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? "Creating account..." : "Register"}
