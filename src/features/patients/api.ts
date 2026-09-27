@@ -1,6 +1,6 @@
 'use client';
 
-import { useAuthStore } from '@/store/auth/auth.store';
+import { getSession } from 'next-auth/react';
 import type {
   IPatientFilters,
   IPatientWithDoctor,
@@ -11,8 +11,9 @@ import { IPatient } from '../doctors/types';
 
 const API_URL = 'http://localhost:5000/api/v1';
 
-const getHeaders = () => {
-  const token = useAuthStore.getState().token;
+const getHeaders = async () => {
+  const session = await getSession();
+  const token = (session as any)?.accessToken;
   return {
     'Content-Type': 'application/json',
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -41,7 +42,7 @@ export async function fetchPatients(
     query.append('createdAt[$lte]', to.toISOString());
   }
 
-  const res = await fetch(`${API_URL}/patients?${query.toString()}`, { headers: getHeaders() });
+  const res = await fetch(`${API_URL}/patients?${query.toString()}`, { headers: await getHeaders() });
   const json = await res.json();
   if (!json.success) throw new Error(json.message);
 
@@ -60,7 +61,7 @@ export async function fetchPatients(
 }
 
 export async function fetchPatientById(id: string): Promise<IPatient> {
-  const res = await fetch(`${API_URL}/patients/${id}`, { headers: getHeaders() });
+  const res = await fetch(`${API_URL}/patients/${id}`, { headers: await getHeaders() });
   const json = await res.json();
   if (!json.success) throw new Error(json.message);
   return { ...json.data, id: json.data._id };
@@ -69,7 +70,7 @@ export async function fetchPatientById(id: string): Promise<IPatient> {
 export async function updatePatient(id: string, input: IUpdatePatientInput): Promise<IPatient> {
   const res = await fetch(`${API_URL}/patients/${id}`, {
     method: 'PATCH',
-    headers: getHeaders(),
+    headers: await getHeaders(),
     body: JSON.stringify(input),
   });
   const json = await res.json();
@@ -80,7 +81,7 @@ export async function updatePatient(id: string, input: IUpdatePatientInput): Pro
 export async function deletePatientGlobal(patientId: string): Promise<void> {
   const res = await fetch(`${API_URL}/patients/${patientId}`, {
     method: 'DELETE',
-    headers: getHeaders(),
+    headers: await getHeaders(),
   });
   const json = await res.json();
   if (!json.success) throw new Error(json.message);
@@ -88,7 +89,7 @@ export async function deletePatientGlobal(patientId: string): Promise<void> {
 
 export async function getDoctorName(doctorId: string): Promise<string> {
   try {
-    const res = await fetch(`${API_URL}/doctors/${doctorId}`, { headers: getHeaders() });
+    const res = await fetch(`${API_URL}/doctors/${doctorId}`, { headers: await getHeaders() });
     const json = await res.json();
     return json.data?.name || 'Unknown';
   } catch {
