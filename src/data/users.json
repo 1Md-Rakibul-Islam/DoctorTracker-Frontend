@@ -1,9 +1,0 @@
-[
-  {
-    "id": "user-001",
-    "name": "Admin User",
-    "email": "admin@doctortracker.com",
-    "password": "admin123",
-    "role": "admin"
-  }
-]

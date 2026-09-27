@@ -1,7 +1,6 @@
 "use client";
 
 import { Search, Filter, X } from "lucide-react";
-import doctorsData from "@/data/doctors.json";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -130,7 +129,7 @@ export function PatientFiltersBar({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All doctors</SelectItem>
-              {doctorsData.map((d) => (
+              {doctorsData?.map((d) => (
                 <SelectItem key={d.id} value={d.id}>
                   {d.name}
                 </SelectItem>
