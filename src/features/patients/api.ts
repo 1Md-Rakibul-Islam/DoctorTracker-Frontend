@@ -6,13 +6,12 @@ import type {
   IPatientWithDoctor,
   IUpdatePatientInput,
 } from './types';
-import type { IDoctor } from '@/types/doctor.interface';
 import { IPatient } from '../doctors/types';
 import Constants from '@/constants/API_CONSTANT';
 
 const getHeaders = async () => {
   const session = await getSession();
-  const token = (session as any)?.accessToken;
+  const token = (session as { accessToken?: string })?.accessToken;
   return {
     'Content-Type': 'application/json',
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -45,6 +44,7 @@ export async function fetchPatients(
   const json = await res.json();
   if (!json.success) throw new Error(json.message);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const data = json.data.map((p: any) => ({
     ...p,
     id: p._id,

@@ -7,7 +7,7 @@ import Constants from '@/constants/API_CONSTANT';
 
 const getHeaders = async () => {
   const session = await getSession();
-  const token = (session as any)?.accessToken;
+  const token = (session as { accessToken?: string })?.accessToken;
   return {
     'Content-Type': 'application/json',
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -40,6 +40,7 @@ export async function fetchDoctors(
   if (!json.success) throw new Error(json.message);
 
   // Map backend _id to id for frontend compatibility
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const data = json.data.map((d: any) => ({
     ...d,
     id: d._id,
@@ -64,6 +65,7 @@ export async function fetchPatientsByDoctorId(doctorId: string): Promise<Patient
   const res = await fetch(Constants.DOCTOR_PATIENTS(doctorId), { headers: await getHeaders() });
   const json = await res.json();
   if (!json.success) throw new Error(json.message);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return json.data.map((p: any) => ({ ...p, id: p._id }));
 }
 
@@ -107,6 +109,7 @@ export async function getSpecializations(): Promise<string[]> {
   const json = await res.json();
   if (!json.success) return [];
   const specs = new Set<string>();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   json.data.forEach((d: any) => specs.add(d.specialization));
   return Array.from(specs).sort();
 }
@@ -116,6 +119,7 @@ export async function getHospitals(): Promise<string[]> {
   const json = await res.json();
   if (!json.success) return [];
   const hosp = new Set<string>();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   json.data.forEach((d: any) => hosp.add(d.hospital));
   return Array.from(hosp).sort();
 }

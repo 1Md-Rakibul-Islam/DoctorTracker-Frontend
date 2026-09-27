@@ -4,7 +4,7 @@ import Constants from '@/constants/API_CONSTANT';
 
 const getHeaders = async () => {
   const session = await getSession();
-  const token = (session as any)?.accessToken;
+  const token = (session as { accessToken?: string })?.accessToken;
   return {
     'Content-Type': 'application/json',
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
