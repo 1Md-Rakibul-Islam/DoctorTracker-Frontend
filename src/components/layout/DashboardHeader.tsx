@@ -51,24 +51,6 @@ export function DashboardHeader() {
           {subtitle}
         </p>
       </div>
-      <div className="hidden md:flex items-center relative w-64">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-        <Input
-          placeholder="Quick search..."
-          className="pl-9 h-9 bg-muted/50 border-transparent focus-visible:border-border"
-        />
-      </div>
-      <Button
-        variant="ghost"
-        size="icon"
-        className="relative"
-        aria-label="Notifications"
-      >
-        <Bell className="w-5 h-5" />
-        <Badge className="absolute -top-1 -right-1 h-4 min-w-4 px-1 text-[10px] p-0 flex items-center justify-center">
-          3
-        </Badge>
-      </Button>
     </header>
   );
 }

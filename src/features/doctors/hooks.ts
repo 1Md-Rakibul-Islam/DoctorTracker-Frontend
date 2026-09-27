@@ -44,6 +44,7 @@ export function useCreateDoctor() {
     mutationFn: async (input) => createDoctor(input),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['doctors'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });
       toast.success('Doctor created successfully');
     },
     onError: () => {

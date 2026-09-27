@@ -12,7 +12,10 @@ const getHeaders = async () => {
 };
 
 export async function fetchDashboardStats(): Promise<DashboardStats> {
-  const res = await fetch(Constants.DASHBOARD_STATS, { headers: await getHeaders() });
+  const res = await fetch(Constants.DASHBOARD_STATS, {
+    headers: await getHeaders(),
+    cache: 'no-store'
+  });
   const json = await res.json();
   if (!json.success) throw new Error(json.message);
 

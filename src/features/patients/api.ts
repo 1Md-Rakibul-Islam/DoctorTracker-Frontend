@@ -40,7 +40,7 @@ export async function fetchPatients(
     query.append('createdAt[$lte]', to.toISOString());
   }
 
-  const res = await fetch(Constants.GET_PATIENTS(query.toString()), { headers: await getHeaders() });
+  const res = await fetch(Constants.GET_PATIENTS(query.toString()), { headers: await getHeaders(), cache: 'no-store' });
   const json = await res.json();
   if (!json.success) throw new Error(json.message);
 
@@ -60,7 +60,7 @@ export async function fetchPatients(
 }
 
 export async function fetchPatientById(id: string): Promise<IPatient> {
-  const res = await fetch(Constants.PATIENT_DETAILS(id), { headers: await getHeaders() });
+  const res = await fetch(Constants.PATIENT_DETAILS(id), { headers: await getHeaders(), cache: 'no-store' });
   const json = await res.json();
   if (!json.success) throw new Error(json.message);
   return { ...json.data, id: json.data._id };
@@ -69,7 +69,7 @@ export async function fetchPatientById(id: string): Promise<IPatient> {
 export async function updatePatient(id: string, input: IUpdatePatientInput): Promise<IPatient> {
   const res = await fetch(Constants.PATIENT_DETAILS(id), {
     method: 'PATCH',
-    headers: await getHeaders(),
+    headers: await getHeaders(), cache: 'no-store',
     body: JSON.stringify(input),
   });
   const json = await res.json();
@@ -80,7 +80,7 @@ export async function updatePatient(id: string, input: IUpdatePatientInput): Pro
 export async function deletePatientGlobal(patientId: string): Promise<void> {
   const res = await fetch(Constants.PATIENT_DETAILS(patientId), {
     method: 'DELETE',
-    headers: await getHeaders(),
+    headers: await getHeaders(), cache: 'no-store',
   });
   const json = await res.json();
   if (!json.success) throw new Error(json.message);
@@ -88,7 +88,7 @@ export async function deletePatientGlobal(patientId: string): Promise<void> {
 
 export async function getDoctorName(doctorId: string): Promise<string> {
   try {
-    const res = await fetch(Constants.DOCTOR_DETAILS(doctorId), { headers: await getHeaders() });
+    const res = await fetch(Constants.DOCTOR_DETAILS(doctorId), { headers: await getHeaders(), cache: 'no-store' });
     const json = await res.json();
     return json.data?.name || 'Unknown';
   } catch {
