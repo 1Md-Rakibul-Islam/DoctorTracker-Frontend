@@ -87,7 +87,7 @@ function MobileBrand() {
 
 function UserSection({ onLogout }: { onLogout: () => void }) {
   const { user } = useAuth();
-  const initials = user
+  const initials = user?.name
     ? user.name
         .split(" ")
         .map((p: string) => p[0])
