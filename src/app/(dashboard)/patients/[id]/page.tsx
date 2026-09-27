@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
@@ -15,6 +16,14 @@ export default function PatientDetailPage() {
   const id = params.id as string;
 
   const { data: patient, isLoading } = usePatient(id);
+
+  const [doctorName, setDoctorName] = useState<string>("Loading...");
+
+  useEffect(() => {
+    if (patient) {
+      getDoctorName(patient.doctorId).then(setDoctorName);
+    }
+  }, [patient]);
 
   if (isLoading) {
     return (
@@ -44,8 +53,6 @@ export default function PatientDetailPage() {
       </div>
     );
   }
-
-  const doctorName = getDoctorName(patient.doctorId);
 
   return (
     <div className="space-y-4 max-w-4xl mx-auto">

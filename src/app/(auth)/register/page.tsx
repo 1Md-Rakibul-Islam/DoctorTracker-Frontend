@@ -4,9 +4,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Activity, Eye, EyeOff, Lock, Mail, Shield } from "lucide-react";
+import { Activity, Eye, EyeOff, Lock, Mail, Shield, User } from "lucide-react";
 import { toast } from "sonner";
-import { loginSchema, type LoginFormData } from "@/features/auth/schema";
+import { registerSchema, type RegisterFormData } from "@/features/auth/schema";
 import { useAuth } from "@/features/auth/hooks";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,10 +19,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import Link from "next/link";
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const router = useRouter();
-  const { authenticate } = useAuth();
+  const { registerUser } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -30,24 +31,26 @@ export default function LoginPage() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
     defaultValues: {
-      email: "admin@doctortracker.com",
-      password: "admin123",
+      name: "",
+      email: "",
+      password: "",
+      role: "doctor",
     },
   });
 
-  const onSubmit = async (data: LoginFormData) => {
+  const onSubmit = async (data: RegisterFormData) => {
     setIsLoading(true);
-    const result = await authenticate(data);
+    const result = await registerUser(data);
     if (result.success) {
-      toast.success("Welcome back!", {
-        description: "You have been logged in successfully.",
+      toast.success("Account created!", {
+        description: "You have successfully registered. Please log in.",
       });
-      router.push("/dashboard");
+      router.push("/login");
     } else {
-      toast.error("Login failed", {
+      toast.error("Registration failed", {
         description: result.error,
       });
     }
@@ -61,7 +64,7 @@ export default function LoginPage() {
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-blue-200/30 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
       </div>
 
-      <div className="relative w-full max-w-md animate-fade-in">
+      <div className="relative w-full max-w-md animate-fade-in my-8">
         <div className="flex flex-col items-center mb-8">
           <div className="flex items-center gap-2 mb-2">
             <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-primary text-primary-foreground shadow-lg shadow-primary/20">
@@ -80,14 +83,33 @@ export default function LoginPage() {
           <CardHeader className="space-y-1">
             <CardTitle className="text-xl flex items-center gap-2">
               <Shield className="w-5 h-5 text-primary" />
-              Sign in
+              Create an account
             </CardTitle>
             <CardDescription>
-              Enter your credentials to access the dashboard
+              Enter your details to register for the portal
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">Full Name</Label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    id="name"
+                    type="text"
+                    placeholder="John Doe"
+                    className="pl-10"
+                    {...register("name")}
+                  />
+                </div>
+                {errors.name && (
+                  <p className="text-xs text-destructive">
+                    {errors.name.message}
+                  </p>
+                )}
+              </div>
+
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <div className="relative">
@@ -95,7 +117,7 @@ export default function LoginPage() {
                   <Input
                     id="email"
                     type="email"
-                    placeholder="admin@doctortracker.com"
+                    placeholder="doctor@doctortracker.com"
                     className="pl-10"
                     {...register("email")}
                   />
@@ -108,18 +130,13 @@ export default function LoginPage() {
               </div>
 
               <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="password">Password</Label>
-                  <span className="text-xs text-muted-foreground">
-                    Demo credentials
-                  </span>
-                </div>
+                <Label htmlFor="password">Password</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="Enter your password"
+                    placeholder="Create a password"
                     className="pl-10 pr-10"
                     {...register("password")}
                   />
@@ -142,18 +159,40 @@ export default function LoginPage() {
                 )}
               </div>
 
+              <div className="space-y-2">
+                <Label htmlFor="role">I am a...</Label>
+                <div className="relative">
+                  <select
+                    id="role"
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    {...register("role")}
+                  >
+                    <option value="doctor">Doctor</option>
+                    <option value="patient">Patient</option>
+                    <option value="admin">Administrator</option>
+                  </select>
+                </div>
+                {errors.role && (
+                  <p className="text-xs text-destructive">
+                    {errors.role.message}
+                  </p>
+                )}
+              </div>
+
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Signing in..." : "Sign in"}
+                {isLoading ? "Creating account..." : "Register"}
               </Button>
             </form>
           </CardContent>
           <CardFooter className="flex flex-col gap-3 border-t pt-4">
-            <div className="w-full rounded-lg bg-muted/50 p-3 text-xs text-muted-foreground">
-              <p className="font-medium text-foreground mb-1">
-                Demo Credentials
-              </p>
-              <p>Email: admin@doctortracker.com</p>
-              <p>Password: admin123</p>
+            <div className="w-full text-center text-sm text-muted-foreground">
+              Already have an account?{" "}
+              <Link
+                href="/login"
+                className="text-primary hover:underline font-medium"
+              >
+                Sign in here
+              </Link>
             </div>
           </CardFooter>
         </Card>

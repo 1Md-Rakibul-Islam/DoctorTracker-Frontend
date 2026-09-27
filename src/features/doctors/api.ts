@@ -1,103 +1,121 @@
 'use client';
 
-import doctorsData from '@/data/doctors.json';
-import patientsData from '@/data/patients.json';
-import type { IDoctor as Doctor, IPatient as Patient, DoctorFilters, IDoctorWithPatientCount as DoctorWithPatientCount, ICreateDoctorInput as CreateDoctorInput } from './types';
+import { useAuthStore } from '@/store/auth/auth.store';
+import type { IDoctor as Doctor, DoctorFilters, IDoctorWithPatientCount as DoctorWithPatientCount, ICreateDoctorInput as CreateDoctorInput } from './types';
+import type { IPatient as Patient } from '@/types/patient.interface';
 
-let doctors: Doctor[] = [...doctorsData] as Doctor[];
-let patients: Patient[] = [...patientsData] as Patient[];
+const API_URL = 'http://localhost:5000/api/v1';
 
-export function fetchDoctors(
+const getHeaders = () => {
+  const token = useAuthStore.getState().token;
+  return {
+    'Content-Type': 'application/json',
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+};
+
+export async function fetchDoctors(
   page: number,
   pageSize: number,
   filters: DoctorFilters
-): { data: DoctorWithPatientCount[]; total: number; totalPages: number } {
-  let filtered = [...doctors];
+): Promise<{ data: DoctorWithPatientCount[]; total: number; totalPages: number }> {
+  const query = new URLSearchParams({
+    page: String(page),
+    limit: String(pageSize),
+  });
 
-  if (filters.search) {
-    const q = filters.search.toLowerCase();
-    filtered = filtered.filter(
-      (d) =>
-        d.name.toLowerCase().includes(q) ||
-        d.email.toLowerCase().includes(q) ||
-        d.phone.includes(q)
-    );
-  }
-
-  if (filters.specialization && filters.specialization !== 'all') {
-    filtered = filtered.filter((d) => d.specialization === filters.specialization);
-  }
-
-  if (filters.hospital && filters.hospital !== 'all') {
-    filtered = filtered.filter((d) => d.hospital === filters.hospital);
-  }
-
-  if (filters.dateFrom) {
-    const from = new Date(filters.dateFrom);
-    filtered = filtered.filter((d) => new Date(d.createdAt) >= from);
-  }
-
+  if (filters.search) query.append('searchTerm', filters.search);
+  if (filters.specialization && filters.specialization !== 'all') query.append('specialization', filters.specialization);
+  if (filters.hospital && filters.hospital !== 'all') query.append('hospital', filters.hospital);
+  if (filters.dateFrom) query.append('createdAt[$gte]', new Date(filters.dateFrom).toISOString());
   if (filters.dateTo) {
     const to = new Date(filters.dateTo);
     to.setHours(23, 59, 59, 999);
-    filtered = filtered.filter((d) => new Date(d.createdAt) <= to);
+    query.append('createdAt[$lte]', to.toISOString());
   }
 
-  filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  const res = await fetch(`${API_URL}/doctors?${query.toString()}`, { headers: getHeaders() });
+  const json = await res.json();
 
-  const total = filtered.length;
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
-  const start = (page - 1) * pageSize;
-  const data = filtered
-    .slice(start, start + pageSize)
-    .map((d) => ({
-      ...d,
-      patientCount: patients.filter((p) => p.doctorId === d.id).length,
-    }));
+  if (!json.success) throw new Error(json.message);
 
-  return { data, total, totalPages };
-}
+  // Map backend _id to id for frontend compatibility
+  const data = json.data.map((d: any) => ({
+    ...d,
+    id: d._id,
+    patientCount: 0, // In backend, we would need to join or fetch this. For now, it might be 0 unless backend returns it. Wait, the backend doesn't return patientCount in the list? We can fetch it or just display it.
+  }));
 
-export function fetchDoctorById(id: string): Doctor | undefined {
-  return doctors.find((d) => d.id === id);
-}
-
-export function fetchPatientsByDoctorId(doctorId: string): Patient[] {
-  return patients.filter((p) => p.doctorId === doctorId);
-}
-
-export function createDoctor(input: CreateDoctorInput): Doctor {
-  const newDoctor: Doctor = {
-    id: `doc-${String(doctors.length + 1).padStart(3, '0')}-${Date.now()}`,
-    ...input,
-    createdAt: new Date().toISOString(),
+  return {
+    data,
+    total: json.meta.total,
+    totalPages: json.meta.totalPage,
   };
-  doctors = [newDoctor, ...doctors];
-  return newDoctor;
 }
 
-export function deletePatient(patientId: string): void {
-  patients = patients.filter((p) => p.id !== patientId);
+export async function fetchDoctorById(id: string): Promise<Doctor> {
+  const res = await fetch(`${API_URL}/doctors/${id}`, { headers: getHeaders() });
+  const json = await res.json();
+  if (!json.success) throw new Error(json.message);
+  return { ...json.data, id: json.data._id };
 }
 
-export function addPatientToDoctor(
+export async function fetchPatientsByDoctorId(doctorId: string): Promise<Patient[]> {
+  const res = await fetch(`${API_URL}/doctors/${doctorId}/patients`, { headers: getHeaders() });
+  const json = await res.json();
+  if (!json.success) throw new Error(json.message);
+  return json.data.map((p: any) => ({ ...p, id: p._id }));
+}
+
+export async function createDoctor(input: CreateDoctorInput): Promise<Doctor> {
+  const res = await fetch(`${API_URL}/doctors`, {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify(input),
+  });
+  const json = await res.json();
+  if (!json.success) throw new Error(json.message);
+  return { ...json.data, id: json.data._id };
+}
+
+export async function deletePatient(patientId: string): Promise<void> {
+  const res = await fetch(`${API_URL}/patients/${patientId}`, {
+    method: 'DELETE',
+    headers: getHeaders(),
+  });
+  const json = await res.json();
+  if (!json.success) throw new Error(json.message);
+}
+
+export async function addPatientToDoctor(
   doctorId: string,
   patient: Omit<Patient, 'id' | 'doctorId' | 'createdAt'>
-): Patient {
-  const newPatient: Patient = {
-    ...patient,
-    id: `pat-${String(patients.length + 1).padStart(3, '0')}-${Date.now()}`,
-    doctorId,
-    createdAt: new Date().toISOString(),
-  };
-  patients = [newPatient, ...patients];
-  return newPatient;
+): Promise<Patient> {
+  const res = await fetch(`${API_URL}/doctors/${doctorId}/patients`, {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify(patient),
+  });
+  const json = await res.json();
+  if (!json.success) throw new Error(json.message);
+  return { ...json.data, id: json.data._id };
 }
 
-export function getSpecializations(): string[] {
-  return Array.from(new Set(doctors.map((d) => d.specialization))).sort();
+export async function getSpecializations(): Promise<string[]> {
+  // Mock implementations for filters since backend might not have dedicated distinct routes yet
+  const res = await fetch(`${API_URL}/doctors?limit=1000`, { headers: getHeaders() });
+  const json = await res.json();
+  if (!json.success) return [];
+  const specs = new Set<string>();
+  json.data.forEach((d: any) => specs.add(d.specialization));
+  return Array.from(specs).sort();
 }
 
-export function getHospitals(): string[] {
-  return Array.from(new Set(doctors.map((d) => d.hospital))).sort();
+export async function getHospitals(): Promise<string[]> {
+  const res = await fetch(`${API_URL}/doctors?limit=1000`, { headers: getHeaders() });
+  const json = await res.json();
+  if (!json.success) return [];
+  const hosp = new Set<string>();
+  json.data.forEach((d: any) => hosp.add(d.hospital));
+  return Array.from(hosp).sort();
 }

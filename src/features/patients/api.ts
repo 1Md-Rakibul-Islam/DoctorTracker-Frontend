@@ -1,7 +1,6 @@
 'use client';
 
-import doctorsData from '@/data/doctors.json';
-import patientsData from '@/data/patients.json';
+import { useAuthStore } from '@/store/auth/auth.store';
 import type {
   IPatientFilters,
   IPatientWithDoctor,
@@ -10,81 +9,89 @@ import type {
 import type { IDoctor } from '@/types/doctor.interface';
 import { IPatient } from '../doctors/types';
 
-const doctors: IDoctor[] = [...doctorsData] as IDoctor[];
-let patients: IPatient[] = [...patientsData] as IPatient[];
+const API_URL = 'http://localhost:5000/api/v1';
 
-export function fetchPatients(
+const getHeaders = () => {
+  const token = useAuthStore.getState().token;
+  return {
+    'Content-Type': 'application/json',
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+};
+
+export async function fetchPatients(
   page: number,
   pageSize: number,
   filters: IPatientFilters
-): { data: IPatientWithDoctor[]; total: number; totalPages: number } {
-  let filtered = [...patients];
+): Promise<{ data: IPatientWithDoctor[]; total: number; totalPages: number }> {
+  const query = new URLSearchParams({
+    page: String(page),
+    limit: String(pageSize),
+  });
 
-  if (filters.search) {
-    const q = filters.search.toLowerCase();
-    filtered = filtered.filter(
-      (p) =>
-        p.name.toLowerCase().includes(q) ||
-        p.email.toLowerCase().includes(q) ||
-        p.phone.includes(q) ||
-        p.diagnosis.toLowerCase().includes(q)
-    );
-  }
+  if (filters.search) query.append('searchTerm', filters.search);
+  if (filters.condition && filters.condition !== 'all') query.append('condition', filters.condition);
+  if (filters.gender && filters.gender !== 'all') query.append('gender', filters.gender);
+  if (filters.doctorId && filters.doctorId !== 'all') query.append('doctorId', filters.doctorId);
 
-  if (filters.condition && filters.condition !== 'all') {
-    filtered = filtered.filter((p) => p.condition === filters.condition);
-  }
-
-  if (filters.gender && filters.gender !== 'all') {
-    filtered = filtered.filter((p) => p.gender === filters.gender);
-  }
-
-  if (filters.doctorId && filters.doctorId !== 'all') {
-    filtered = filtered.filter((p) => p.doctorId === filters.doctorId);
-  }
-
-  if (filters.dateFrom) {
-    const from = new Date(filters.dateFrom);
-    filtered = filtered.filter((p) => new Date(p.createdAt) >= from);
-  }
-
+  if (filters.dateFrom) query.append('createdAt[$gte]', new Date(filters.dateFrom).toISOString());
   if (filters.dateTo) {
     const to = new Date(filters.dateTo);
     to.setHours(23, 59, 59, 999);
-    filtered = filtered.filter((p) => new Date(p.createdAt) <= to);
+    query.append('createdAt[$lte]', to.toISOString());
   }
 
-  filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  const res = await fetch(`${API_URL}/patients?${query.toString()}`, { headers: getHeaders() });
+  const json = await res.json();
+  if (!json.success) throw new Error(json.message);
 
-  const total = filtered.length;
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
-  const start = (page - 1) * pageSize;
-  const data = filtered.slice(start, start + pageSize).map((p) => {
-    const doctor = doctors.find((d) => d.id === p.doctorId);
-    return {
-      ...p,
-      doctorName: doctor?.name || 'Unknown',
-      doctorSpecialization: doctor?.specialization || 'Unknown',
-    };
+  const data = json.data.map((p: any) => ({
+    ...p,
+    id: p._id,
+    doctorName: 'Doctor', // If backend doesn't populate, we can just supply generic or fetch.
+    doctorSpecialization: 'Specialization'
+  }));
+
+  return {
+    data,
+    total: json.meta.total,
+    totalPages: json.meta.totalPage,
+  };
+}
+
+export async function fetchPatientById(id: string): Promise<IPatient> {
+  const res = await fetch(`${API_URL}/patients/${id}`, { headers: getHeaders() });
+  const json = await res.json();
+  if (!json.success) throw new Error(json.message);
+  return { ...json.data, id: json.data._id };
+}
+
+export async function updatePatient(id: string, input: IUpdatePatientInput): Promise<IPatient> {
+  const res = await fetch(`${API_URL}/patients/${id}`, {
+    method: 'PATCH',
+    headers: getHeaders(),
+    body: JSON.stringify(input),
   });
-
-  return { data, total, totalPages };
+  const json = await res.json();
+  if (!json.success) throw new Error(json.message);
+  return { ...json.data, id: json.data._id };
 }
 
-export function fetchPatientById(id: string): IPatient | undefined {
-  return patients.find((p) => p.id === id);
+export async function deletePatientGlobal(patientId: string): Promise<void> {
+  const res = await fetch(`${API_URL}/patients/${patientId}`, {
+    method: 'DELETE',
+    headers: getHeaders(),
+  });
+  const json = await res.json();
+  if (!json.success) throw new Error(json.message);
 }
 
-export function updatePatient(id: string, input: IUpdatePatientInput): IPatient | undefined {
-  patients = patients.map((p) => (p.id === id ? { ...p, ...input } : p));
-  return patients.find((p) => p.id === id);
-}
-
-export function deletePatientGlobal(patientId: string): void {
-  patients = patients.filter((p) => p.id !== patientId);
-}
-
-export function getDoctorName(doctorId: string): string {
-  const doc = doctors.find((d) => d.id === doctorId);
-  return doc?.name || 'Unknown';
+export async function getDoctorName(doctorId: string): Promise<string> {
+  try {
+    const res = await fetch(`${API_URL}/doctors/${doctorId}`, { headers: getHeaders() });
+    const json = await res.json();
+    return json.data?.name || 'Unknown';
+  } catch {
+    return 'Unknown';
+  }
 }
