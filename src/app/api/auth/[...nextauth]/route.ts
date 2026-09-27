@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import NextAuth from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
+import Constants from "@/constants/API_CONSTANT"
 
 const handler = NextAuth({
   providers: [
@@ -13,7 +15,7 @@ const handler = NextAuth({
         if (!credentials?.email || !credentials?.password) return null;
 
         try {
-          const res = await fetch("http://localhost:5000/api/v1/auth/login", {
+          const res = await fetch(Constants.LOGIN, {
             method: 'POST',
             body: JSON.stringify(credentials),
             headers: { "Content-Type": "application/json" }

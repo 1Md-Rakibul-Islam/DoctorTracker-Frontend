@@ -2,6 +2,7 @@
 
 import { useSession, signIn, signOut } from "next-auth/react";
 import type { LoginCredentials, LoginResponse, RegisterCredentials, RegisterResponse } from './types';
+import Constants from "@/constants/API_CONSTANT";
 
 export function useAuth() {
   const { data: session, status } = useSession();
@@ -21,7 +22,7 @@ export function useAuth() {
 
   const registerUser = async (credentials: RegisterCredentials): Promise<RegisterResponse> => {
     try {
-      const res = await fetch('http://localhost:5000/api/v1/auth/register', {
+      const res = await fetch(Constants.REGISTER, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(credentials),

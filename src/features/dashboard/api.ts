@@ -1,7 +1,6 @@
 import { getSession } from 'next-auth/react';
 import type { DashboardStats } from './types';
-
-const API_URL = 'http://localhost:5000/api/v1';
+import Constants from '@/constants/API_CONSTANT';
 
 const getHeaders = async () => {
   const session = await getSession();
@@ -13,7 +12,7 @@ const getHeaders = async () => {
 };
 
 export async function fetchDashboardStats(): Promise<DashboardStats> {
-  const res = await fetch(`${API_URL}/dashboard/stats`, { headers: await getHeaders() });
+  const res = await fetch(Constants.DASHBOARD_STATS, { headers: await getHeaders() });
   const json = await res.json();
   if (!json.success) throw new Error(json.message);
 

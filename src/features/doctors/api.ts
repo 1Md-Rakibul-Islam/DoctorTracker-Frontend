@@ -3,8 +3,7 @@
 import { getSession } from 'next-auth/react';
 import type { IDoctor as Doctor, DoctorFilters, IDoctorWithPatientCount as DoctorWithPatientCount, ICreateDoctorInput as CreateDoctorInput } from './types';
 import type { IPatient as Patient } from '@/types/patient.interface';
-
-const API_URL = 'http://localhost:5000/api/v1';
+import Constants from '@/constants/API_CONSTANT';
 
 const getHeaders = async () => {
   const session = await getSession();
@@ -35,7 +34,7 @@ export async function fetchDoctors(
     query.append('createdAt[$lte]', to.toISOString());
   }
 
-  const res = await fetch(`${API_URL}/doctors?${query.toString()}`, { headers: await getHeaders() });
+  const res = await fetch(Constants.GET_DOCTORS(query.toString()), { headers: await getHeaders() });
   const json = await res.json();
 
   if (!json.success) throw new Error(json.message);
@@ -55,21 +54,21 @@ export async function fetchDoctors(
 }
 
 export async function fetchDoctorById(id: string): Promise<Doctor> {
-  const res = await fetch(`${API_URL}/doctors/${id}`, { headers: await getHeaders() });
+  const res = await fetch(Constants.DOCTOR_DETAILS(id), { headers: await getHeaders() });
   const json = await res.json();
   if (!json.success) throw new Error(json.message);
   return { ...json.data, id: json.data._id };
 }
 
 export async function fetchPatientsByDoctorId(doctorId: string): Promise<Patient[]> {
-  const res = await fetch(`${API_URL}/doctors/${doctorId}/patients`, { headers: await getHeaders() });
+  const res = await fetch(Constants.DOCTOR_PATIENTS(doctorId), { headers: await getHeaders() });
   const json = await res.json();
   if (!json.success) throw new Error(json.message);
   return json.data.map((p: any) => ({ ...p, id: p._id }));
 }
 
 export async function createDoctor(input: CreateDoctorInput): Promise<Doctor> {
-  const res = await fetch(`${API_URL}/doctors`, {
+  const res = await fetch(Constants.CREATE_DOCTOR, {
     method: 'POST',
     headers: await getHeaders(),
     body: JSON.stringify(input),
@@ -80,7 +79,7 @@ export async function createDoctor(input: CreateDoctorInput): Promise<Doctor> {
 }
 
 export async function deletePatient(patientId: string): Promise<void> {
-  const res = await fetch(`${API_URL}/patients/${patientId}`, {
+  const res = await fetch(Constants.PATIENT_DETAILS(patientId), {
     method: 'DELETE',
     headers: await getHeaders(),
   });
@@ -92,7 +91,7 @@ export async function addPatientToDoctor(
   doctorId: string,
   patient: Omit<Patient, 'id' | 'doctorId' | 'createdAt'>
 ): Promise<Patient> {
-  const res = await fetch(`${API_URL}/doctors/${doctorId}/patients`, {
+  const res = await fetch(Constants.DOCTOR_PATIENTS(doctorId), {
     method: 'POST',
     headers: await getHeaders(),
     body: JSON.stringify(patient),
@@ -104,7 +103,7 @@ export async function addPatientToDoctor(
 
 export async function getSpecializations(): Promise<string[]> {
   // Mock implementations for filters since backend might not have dedicated distinct routes yet
-  const res = await fetch(`${API_URL}/doctors?limit=1000`, { headers: await getHeaders() });
+  const res = await fetch(Constants.GET_DOCTORS('limit=1000'), { headers: await getHeaders() });
   const json = await res.json();
   if (!json.success) return [];
   const specs = new Set<string>();
@@ -113,7 +112,7 @@ export async function getSpecializations(): Promise<string[]> {
 }
 
 export async function getHospitals(): Promise<string[]> {
-  const res = await fetch(`${API_URL}/doctors?limit=1000`, { headers: await getHeaders() });
+  const res = await fetch(Constants.GET_DOCTORS('limit=1000'), { headers: await getHeaders() });
   const json = await res.json();
   if (!json.success) return [];
   const hosp = new Set<string>();

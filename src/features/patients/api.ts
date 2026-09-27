@@ -8,8 +8,7 @@ import type {
 } from './types';
 import type { IDoctor } from '@/types/doctor.interface';
 import { IPatient } from '../doctors/types';
-
-const API_URL = 'http://localhost:5000/api/v1';
+import Constants from '@/constants/API_CONSTANT';
 
 const getHeaders = async () => {
   const session = await getSession();
@@ -42,7 +41,7 @@ export async function fetchPatients(
     query.append('createdAt[$lte]', to.toISOString());
   }
 
-  const res = await fetch(`${API_URL}/patients?${query.toString()}`, { headers: await getHeaders() });
+  const res = await fetch(Constants.GET_PATIENTS(query.toString()), { headers: await getHeaders() });
   const json = await res.json();
   if (!json.success) throw new Error(json.message);
 
@@ -61,14 +60,14 @@ export async function fetchPatients(
 }
 
 export async function fetchPatientById(id: string): Promise<IPatient> {
-  const res = await fetch(`${API_URL}/patients/${id}`, { headers: await getHeaders() });
+  const res = await fetch(Constants.PATIENT_DETAILS(id), { headers: await getHeaders() });
   const json = await res.json();
   if (!json.success) throw new Error(json.message);
   return { ...json.data, id: json.data._id };
 }
 
 export async function updatePatient(id: string, input: IUpdatePatientInput): Promise<IPatient> {
-  const res = await fetch(`${API_URL}/patients/${id}`, {
+  const res = await fetch(Constants.PATIENT_DETAILS(id), {
     method: 'PATCH',
     headers: await getHeaders(),
     body: JSON.stringify(input),
@@ -79,7 +78,7 @@ export async function updatePatient(id: string, input: IUpdatePatientInput): Pro
 }
 
 export async function deletePatientGlobal(patientId: string): Promise<void> {
-  const res = await fetch(`${API_URL}/patients/${patientId}`, {
+  const res = await fetch(Constants.PATIENT_DETAILS(patientId), {
     method: 'DELETE',
     headers: await getHeaders(),
   });
@@ -89,7 +88,7 @@ export async function deletePatientGlobal(patientId: string): Promise<void> {
 
 export async function getDoctorName(doctorId: string): Promise<string> {
   try {
-    const res = await fetch(`${API_URL}/doctors/${doctorId}`, { headers: await getHeaders() });
+    const res = await fetch(Constants.DOCTOR_DETAILS(doctorId), { headers: await getHeaders() });
     const json = await res.json();
     return json.data?.name || 'Unknown';
   } catch {
