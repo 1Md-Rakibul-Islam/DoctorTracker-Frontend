@@ -37,7 +37,7 @@ export default function RegisterPage() {
       name: "",
       email: "",
       password: "",
-      role: "doctor",
+      role: "admin",
     },
   });
 
@@ -159,25 +159,7 @@ export default function RegisterPage() {
                 )}
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="role">I am a...</Label>
-                <div className="relative">
-                  <select
-                    id="role"
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    {...register("role")}
-                  >
-                    <option value="doctor">Doctor</option>
-                    <option value="patient">Patient</option>
-                    <option value="admin">Administrator</option>
-                  </select>
-                </div>
-                {errors.role && (
-                  <p className="text-xs text-destructive">
-                    {errors.role.message}
-                  </p>
-                )}
-              </div>
+              
 
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? "Creating account..." : "Register"}

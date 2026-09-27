@@ -1,50 +1,13 @@
 # Doctor Tracker Frontend
 
-A modern, responsive administrative portal for the Doctor Tracker application. Built with Next.js (App Router), Tailwind CSS, and shadcn/ui to provide a seamless user experience for managing doctors and patients.
+## Description
+Doctor Tracker is a highly secure, modern administrative web application built with Next.js that empowers clinic administrators to seamlessly manage doctors and their corresponding patients. The platform provides a beautiful, responsive UI with a comprehensive dashboard for data visualization, and rigorous role-based access control, optimizing the overall workflow of medical facility management.
 
-## Table of Contents
+## Setup Guide
 
-- [Tech Stack](#tech-stack)
-- [Features](#features)
-- [Prerequisites](#prerequisites)
-- [Installation](#installation)
-- [Environment Variables](#environment-variables)
-- [Running the App](#running-the-app)
-- [Project Structure](#project-structure)
+Follow these steps to get the frontend running locally.
 
-## Tech Stack
-
-- **Framework:** Next.js (App Router)
-- **Library:** React
-- **Styling:** Tailwind CSS
-- **UI Components:** shadcn/ui & Radix UI
-- **Authentication:** NextAuth.js (Credentials Provider)
-- **Forms & Validation:** React Hook Form & Zod
-- **Icons:** Lucide React
-- **Charts:** Recharts
-- **State Management:** React Context (via providers) & Zustand
-
-## Features
-
-- **Secure Authentication:** Complete login and registration flows protected by NextAuth JWT strategies, integrated with a custom backend.
-- **Role-based Dashboards:** Overview of medical practice statistics and metrics.
-- **Doctor Management:** View, search, filter, create, and manage registered doctors. Includes dynamic tracking of assigned patients.
-- **Patient Management:** View, search, filter, edit, and manage patients. Easily assign or reassign patients to specific doctors.
-- **Centralized API Architecture:** All backend API URLs and routes are rigorously centralized into a single `API_CONSTANT.ts` file.
-- **Fully Responsive:** Mobile-first approach guaranteeing great UI across desktop and mobile devices.
-
-## Prerequisites
-
-Before you begin, ensure you have met the following requirements:
-
-- Node.js (v18 or higher)
-- npm, yarn, or pnpm
-- The `doctor-tracker-backend` must be running locally or deployed.
-
-## Installation
-
-1. **Clone the repository** (if you haven't already):
-
+1. **Clone the repository:**
    ```bash
    git clone <your-repository-url>
    cd doctor-tracker-frontend
@@ -55,65 +18,33 @@ Before you begin, ensure you have met the following requirements:
    npm install
    ```
 
-## Environment Variables
+3. **Configure Environment Variables:**
+   Create a `.env` file in the root directory and use the `.env.example` as a reference.
 
-Create a `.env` file in the root directory of the frontend project and add the following variables:
+4. **Run the Development Server:**
+   ```bash
+   npm run dev
+   ```
 
-```env
-# NextAuth Configuration
-NEXTAUTH_SECRET=your_super_secret_key_at_least_32_chars
-NEXTAUTH_URL=http://localhost:3000
-NEXTAUTH_URL_INTERNAL=http://localhost:3000
+## System Architecture
 
-# Backend API Configuration
-# Point this to your backend server (local or deployed). DO NOT use trailing slashes!
-NEXT_PUBLIC_API_BASE_URL=http://localhost:5000/api/v1
-```
+The frontend follows a modern React/Next.js architecture strictly separated from the backend API.
+- **Client-Side Rendering (CSR) & Server-Side Rendering (SSR):** Next.js App Router handles dynamic page routing.
+- **Data Flow:** The application uses native `fetch` combined with custom React hooks to communicate with the standalone Node.js/Express backend via RESTful endpoints. All API URLs are centralized in an `API_CONSTANT.ts` file for easy environment switching.
+- **State & Auth Management:** NextAuth.js (Credentials Provider) manages the authentication state securely via JWTs stored in HttpOnly cookies, protecting the dashboard and management routes from unauthenticated access. 
 
-> **Important:** If your backend is deployed (e.g. on Vercel), set `NEXT_PUBLIC_API_BASE_URL` to `https://your-backend.vercel.app/api/v1`. Keep `NEXTAUTH_URL` pointing to the URL of the _frontend application_ (e.g. `http://localhost:3000` for development).
+## Technical Decisions
 
-## Running the App
+1. **Why we chose NextAuth.js over Custom JWT Handling**
+   While we could have manually stored the backend's access tokens in `localStorage`, this exposes the application to Cross-Site Scripting (XSS) attacks. By utilizing NextAuth.js, we offload session management to Next.js server-side logic, securely storing tokens and handling callbacks in a standardized way without exposing raw tokens directly to the client bundle.
 
-### Development Mode
+2. **Why we chose shadcn/ui & Tailwind CSS over Material UI**
+   The project specification heavily emphasizes a modern, visually appealing UI with clean layouts. Material UI provides heavy, opinionated components that are hard to override. `shadcn/ui` combined with Tailwind CSS allows us to maintain a fully custom, headless component architecture that guarantees optimal bundle size, absolute styling freedom, and pristine UX without fighting the framework.
 
-To run the Next.js server with Turbopack for fast refresh:
+## Visual Evidence
 
-```bash
-npm run dev
-```
+*(Replace these placeholder links with actual screenshots of your application)*
 
-The application will be available at [http://localhost:3000](http://localhost:3000).
-
-### Production Build
-
-To build and run the optimized production application:
-
-```bash
-npm run build
-npm start
-```
-
-## Project Structure
-
-The project heavily utilizes Feature-Sliced Design principles, grouping logic by business features rather than strictly by file type.
-
-```
-src/
-├── app/                  # Next.js App Router (Pages, Layouts, API routes)
-│   ├── (auth)/           # Authentication pages (Login, Register)
-│   ├── (dashboard)/      # Protected dashboard pages
-│   └── api/auth/         # NextAuth.js endpoints
-├── components/           # Global reusable UI components (shadcn/ui, layout)
-├── constants/            # Centralized constants (API_CONSTANT.ts)
-├── features/             # Feature-based logic (Doctors, Patients, Auth, Dashboard)
-│   ├── auth/             # Hooks, schemas, types for authentication
-│   ├── doctors/          # API fetchers, schemas, types, specialized components
-│   └── patients/         # API fetchers, schemas, types, specialized components
-├── lib/                  # Utility functions (utils.ts)
-├── providers/            # React context providers (AppWrapper, SessionProvider)
-└── types/                # Global TypeScript interfaces
-```
-
----
-
-_Built with ❤️ for Doctor Tracker._
+- **Desktop Dashboard View:** `![Dashboard Desktop](./public/screenshots/dashboard-desktop.png)`
+- **Mobile Responsive View:** `![Dashboard Mobile](./public/screenshots/dashboard-mobile.png)`
+- **Doctor Management List:** `![Doctors List](./public/screenshots/doctors-list.png)`
